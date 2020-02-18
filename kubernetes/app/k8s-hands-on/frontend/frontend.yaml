@@ -1,0 +1,42 @@
+#deployments
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-k8s-hands-on
+  labels:
+    app: frontend
+#replicasets
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  #pod
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: frontend-k8s-hands-on:v1
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-k8s-hands-on
+  labels:
+    app: frontend
+spec:
+  #labels para observar
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    ports:
+      - protocol: TCP
+        nodePort: 30036
+        #mapeo de puertos del pod que voy a consumir
+        port: 80
+        targetPort: 80

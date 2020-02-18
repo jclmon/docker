@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-test
+  annotations:
+    kubernetes.io/change-cause: "Cambio de puerto 90"
+  labels:
+    app: front
+#replicasets
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: front
+  #pod
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 90

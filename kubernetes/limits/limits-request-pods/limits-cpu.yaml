@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-demo
+spec:
+  containers:
+    - name: cpu-demo-ctr
+      image: vish/stress
+      resources:
+        limits:
+          #1000mc o una CPU entera
+          cpu: "1"
+        requests:
+          #500mc o una media CPU
+          cpu: "0.5"
+      args:
+        #se solicita mas CPU de la limitada
+        - -cpus
+        - "2"

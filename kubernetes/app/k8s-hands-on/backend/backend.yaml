@@ -1,0 +1,39 @@
+#deployments
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-k8s-hands-on
+  labels:
+    app: backend
+#replicasets
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  #pod
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: k8s-hands-on:v3
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-k8s-hands-on
+  labels:
+    app: backend
+spec:
+  #labels para observar
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      #mapeo de puertos del pod que voy a consumir
+      port: 80
+      targetPort: 9090
