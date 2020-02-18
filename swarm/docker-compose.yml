@@ -1,0 +1,44 @@
+#lanzar:
+# docker-compose up
+# docker-compose scale web=5
+# docker-compose down
+# docker-compose up --force-recreate -d
+
+# la versión 2 no se puede desplegar en un cluster
+
+
+version: '2'
+services:
+
+ web:
+  image: dockercloud/hello-world
+  ports:
+   - 8080
+  networks:
+   - front-tier
+   - back-tier
+
+ redis:
+  image: redis
+  links:
+   - web
+  networks:
+   - back-tier
+
+ lb:
+   image: dockercloud/haproxy
+   ports:
+    - 1980:80
+   links:
+    - web
+   networks:
+    - front-tier
+    - back-tier
+   volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+ front-tier:
+  driver: bridge
+ back-tier:
+  driver: bridge
