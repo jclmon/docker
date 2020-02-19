@@ -1,6 +1,6 @@
 # DOCKER
 
-## Básicos
+## Comandos básicos
 
 Versión
 ---
@@ -109,13 +109,17 @@ docker-compose up --Start the services defined in the dockercompose.yml file in 
 docker-compose down --Stop the services defined in the docker-compose.yml file in the current folder
 ```
 Conectar por ssh a maquina
+---
 Use docker ps to get the name of the existing container
 Use the command docker exec -it <container name> /bin/bash to get a bash shell in the container
 Generically, use docker exec -it <container name> <command> to execute whatever command you specify in the container.
 
 ## Stop all containers (powershell)
+```
 docker ps -q | % { docker stop $_ }
-
+```
 ## Listar
+```
 docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}"
 docker ps --format "table {{.Image}}\t{{.Ports}} \t{{.Names}}"
+```
