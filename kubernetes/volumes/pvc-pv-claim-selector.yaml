@@ -1,0 +1,47 @@
+# https://docs.okd.io/latest/install_config/persistent_storage/selector_label_binding.html
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/test"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume2
+  labels:
+    mysql: ready
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mysql"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: task-pv-claim2
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # reclama todo ya que no puede compartirlo
+      storage: 1Gi
+  # debe cumplir con el label
+  selector:
+    matchLabels:
+      mysql: ready

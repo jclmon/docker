@@ -1,0 +1,15 @@
+# crea un directorio vacio en el pod si el contedor se recrea se mantiene
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+    - image: nginx:alpine
+      name: test-container
+      volumeMounts:
+        - mountPath: /var/log/nginx
+          name: vol
+  volumes:
+    - name: vol
+      emptyDir: {}
