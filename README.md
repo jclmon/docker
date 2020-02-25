@@ -83,7 +83,7 @@ Ejecutar maquina mapeo de carpetas
 docker run -d -v <ruta_local_despliegue>:/opt/jboss/jboss-eap-6.3/standalone/deployments -v <ruta_local_logs>:/var/log/jboss -i -t -p8081:8080 --name jbosseap1  jbosseap63:centos7 bash
 ```
 
-###Otros
+### Otros
 ```
 docker ps -a -q --filter "name=container_name" --format="{{.ID}}" | ForEach-Object -Process {docker rm $_ -f}
 docker build -t myapp:1.0. --Build an image from the Dockerfile in the current directory and tag the image
