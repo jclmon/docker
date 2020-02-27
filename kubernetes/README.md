@@ -74,6 +74,7 @@ metadata:
 ```
 ### Ver los logs
 ```
+kubectl logs podtest
 172.18.0.1 - - [11/Feb/2020:15:43:10 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.66.0" "-"
 172.18.0.1 - - [11/Feb/2020:15:44:15 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.66.0" "-"
 172.18.0.1 - - [11/Feb/2020:15:44:41 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.66.0" "-"
@@ -81,10 +82,16 @@ metadata:
 ```
 ### Ver los contenedores
 ```
-minikube ssh
-docker ps -f name=podtest
-PS C:\Windows\system32> kubectl exec -ti podtest -- sh
+$ docker ps -f name=podtest
+```
+### Ejecutar pod y entrar al ssh
+```
+$ kubectl exec -ti podtest -- sh
 / #
+```
+### Para entrar a la imagen de minikube
+```
+$ minikube ssh
 ```
 ### Versiones del api para manifiestos yaml
 ```
@@ -144,6 +151,7 @@ kubectl label pods podtest1 app=pop-label
 ```
 
 # DEPLOYMENTS
+
 La gestión de los replicaset para actualizaciones de versión directa, los deployments son un objeto de alto nivel 
 que se hace cargo de los replicaset. 
 
@@ -306,25 +314,7 @@ Si no especifico namespace los pods van al namespace default, kube-system es el 
 > kubectl get all -n kube-system
 NAME                                   READY   STATUS    RESTARTS   AGE
 pod/coredns-6955765f44-pfbbz           1/1     Running   0          39h
-pod/coredns-6955765f44-vc5sc           1/1     Running   0          39h
-pod/etcd-minikube                      1/1     Running   0          39h
-pod/kube-apiserver-minikube            1/1     Running   0          39h
-pod/kube-controller-manager-minikube   1/1     Running   1          39h
-pod/kube-proxy-l9bck                   1/1     Running   0          39h
-pod/kube-scheduler-minikube            1/1     Running   1          39h
-pod/storage-provisioner                1/1     Running   1          39h
-
-NAME               TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE
-service/kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   39h
-
-NAME                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                 AGE
-daemonset.apps/kube-proxy   1         1         1       1            1           beta.kubernetes.io/os=linux   39h
-
-NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/coredns   2/2     2            2           39h
-
-NAME                                 DESIRED   CURRENT   READY   AGE
-replicaset.apps/coredns-6955765f44   2         2         2       39h
+...
 ```
 
 * Crear namespace
@@ -332,21 +322,21 @@ replicaset.apps/coredns-6955765f44   2         2         2       39h
 ```
 > kubectl create namespace test-ns
 namespace/test-ns created
-\kubernetes> kubectl get namespaces
+> kubectl get namespaces
 NAME              STATUS   AGE
 default           Active   39h
 kube-node-lease   Active   39h
 kube-public       Active   39h
 kube-system       Active   39h
 test-ns           Active   4s
-\kubernetes> kubectl get namespaces --show-labels
+> kubectl get namespaces --show-labels
 NAME              STATUS   AGE   LABELS
 default           Active   39h   <none>
 kube-node-lease   Active   39h   <none>
 kube-public       Active   39h   <none>
 kube-system       Active   39h   <none>
 test-ns           Active   22s   <none>
-\kubernetes> kubectl describe namespaces test-ns
+> kubectl describe namespaces test-ns
 Name:         test-ns
 Labels:       <none>
 Annotations:  <none>
@@ -366,7 +356,6 @@ curl backend-k8s-hands-on.ci.svc.cluster.local
 ```
 ### Contextos y namespaces
 Da un contexto para las operaciones, de esta forma no es necesario especificar el namespace
-
 ```
 \kubernetes\namespaces> kubectl config current-context
 minikube
@@ -381,8 +370,7 @@ clusters:
     server: ""
 ...
 ```
-
-Para crear un nuevo contexto y poder cambiar de contexto
+* Para crear un nuevo contexto y poder cambiar de contexto
 ```
 \kubernetes\namespaces> kubectl config set-context ci-context --namespace=ci --cluster=minikube --user=minikube
 Context "ci-context" created.
@@ -491,14 +479,6 @@ esperarlo se pausan. Esperarán hasta que estemos seguros de que la aplicación 
 ```
 \kubernetes\probes> kubectl apply -f .\liveness.yml
 \kubernetes\probes> kubectl describe pod liveness
-Name:         liveness-exec
-Namespace:    default
-Priority:     0
-Node:         minikube/10.228.51.139
-Start Time:   Mon, 24 Feb 2020 16:31:41 +0100
-Labels:       test=liveness
-Annotations:  kubectl.kubernetes.io/last-applied-configuration:
-                {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"test":"liveness"},"name":"liveness-exec","namespace":"default"},"s...
 ...
   Type     Reason     Age                  From               Message
   ----     ------     ----                 ----               -------
@@ -509,10 +489,9 @@ Annotations:  kubectl.kubernetes.io/last-applied-configuration:
   Normal   Pulled     17s (x3 over 2m55s)  kubelet, minikube  Successfully pulled image "k8s.gcr.io/busybox"
   Normal   Created    16s (x3 over 2m54s)  kubelet, minikube  Created container liveness
   Normal   Started    15s (x3 over 2m53s)  kubelet, minikube  Started container liveness
-```
 
-```
 \kubernetes\probes> kubectl apply -f .\liveness-tcp.yml  
+
 \kubernetes\probes> kubectl describe pod goproxy
 Name:         goproxy
 ...
@@ -528,7 +507,7 @@ Maneja el versionado de dockerfiles, separa las configuraciones para hacer más 
 Los configmaps están compuestos por clave, valor. P.e. Nginx:port, 80
 Ng.conf , para que el manifest de un Pod vea el configmap se pueden utilizar variables de entorno.
 
-Configuración de nginx
+* Configuración de nginx
 ```
 \kubernetes\envs> kubectl run --rm -ti --generator=run-pod/v1 podtest3 --image=nginx:alpine -- sh
 If you don't see a command prompt, try pressing enter.
@@ -541,7 +520,7 @@ server {
 \kubernetes\configmap> kubectl create configmap nginx-config --from-file .\configmap-samples\nginx.conf
 configmap/nginx-config created
 ```
-Tambien se puede crear desde una carpeta
+* Tambien se puede crear desde una carpeta
 ```
 \kubernetes\configmap> kubectl create configmap nginx-config1 --from-file .\configmap-samples
 configmap/nginx-config1 created
