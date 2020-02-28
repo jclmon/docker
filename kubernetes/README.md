@@ -27,7 +27,6 @@ Volver a arrancar minikube
 
 ## Asignar el environment de docker a minikube
 ```
-> minikube docker-env
 > minikube docker-env | Invoke-Expression
 ```
 ## Parar minikube
