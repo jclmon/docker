@@ -8,18 +8,21 @@ también:
 ```
 DISM /Online /Enable-Feature /All /FeatureName:Microsoft-Hyper-V
 ```
-## Asignar el environment de docker a minikube
-```
-> minikube docker-env
-> minikube docker-env | Invoke-Expression
-```
 ## Arrancar minikube
 
 Debe estar creado con el Administrador de Hyper-V el conmutador virtual VM-External-Switch como external a la red del equipo (eth0 o wlan)
 ```
 minikube start --vm-driver "hyperv" --hyperv-virtual-switch "VM-External-Switch"
 ```
-
+Si hubiese algún problema al arrancarlo, eliminar carpeta de configuración después de hacer delete,
+```
+C:\Users\usuario\.kube
+```
+## Asignar el environment de docker a minikube
+```
+> minikube docker-env
+> minikube docker-env | Invoke-Expression
+```
 
 # KUBERNETES
 
