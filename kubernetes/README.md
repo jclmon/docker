@@ -14,14 +14,26 @@ Debe estar creado con el Administrador de Hyper-V el conmutador virtual VM-Exter
 ```
 minikube start --vm-driver "hyperv" --hyperv-virtual-switch "VM-External-Switch"
 ```
-Si hubiese algún problema al arrancarlo, eliminar carpeta de configuración después de hacer delete,
+### Si hubiese algún problema:
+* Minikube delete
+```
+minikube delete
+```
+* Borrar fichero configuración
 ```
 C:\Users\usuario\.kube
 ```
+Volver a arrancar minikube
+
 ## Asignar el environment de docker a minikube
 ```
 > minikube docker-env
 > minikube docker-env | Invoke-Expression
+```
+## Parar minikube
+```
+> minikube ssh
+$sudo poweroff
 ```
 
 # KUBERNETES
