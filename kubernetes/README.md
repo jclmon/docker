@@ -4,10 +4,6 @@
 ```
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
 ```
-también:
-```
-DISM /Online /Enable-Feature /All /FeatureName:Microsoft-Hyper-V
-```
 ## Arrancar minikube
 
 Debe estar creado con el Administrador de Hyper-V el conmutador virtual VM-External-Switch como external a la red del equipo (eth0 o wlan)
@@ -19,9 +15,10 @@ minikube start --vm-driver "hyperv" --hyperv-virtual-switch "VM-External-Switch"
 ```
 minikube delete
 ```
-* Borrar fichero configuración
+* Borrar carpetas de configuración
 ```
 C:\Users\usuario\.kube
+C:\Users\usuario\.minikube
 ```
 Volver a arrancar minikube
 
