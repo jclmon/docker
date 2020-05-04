@@ -1,4 +1,4 @@
-#OPENSHIFT
+# OPENSHIFT
 
 # Creando el cluster openshift
 
@@ -40,10 +40,12 @@ $ minishift delete
 
 # Despliegue de la primera aplicación en Openshift
 •	Vamos a crear una aplicación web con un servidor web apache2. Nuestra aplicación tendrá ficheros html y php.
+
 •	Nuestra aplicación la tenemos en un repositorio de GitHub (https://github.com/josedom24/html_for_openshift)
+
 •	Vamos a crear nuestra aplicación usando source2image: al crear la aplicación vamos a escoger una imagen con apache2 y php y vamos a indicar nuestro repositorio con el código, a partir de esta información se va a crear una imagen docker con apache2, php y nuestro código, que va a servir para desplegar la aplicación.
 
-Pasos a seguir
+## Pasos a seguir
 1.	Del catálogo elegimos la imagen de php y elegimos la versión de php con la que vamos a trabajar.
 2.	Indicamos un nombre y el repositorio donde tenemos nuestro código.
 3.	Se va a crear un build: 
@@ -58,21 +60,36 @@ Pasos a seguir
 
 ## Recursos que nos ofrece Openshift
 •	Web Console: Aplicación web que nos permite trabajar con nuestros recursos de OpenShift
+
 •	Catálogo de servicios: Conjunto de imágenes y plantillas bases. A partir de ellas podemos construir (builds) nuevas imágenes con s2i.
+
 •	Proyectos: Permiten a los usuarios organizar y controlar sus aplicaciones.
+
 •	Aplicación: Nuestra aplicación es una aplicación Kubernetes, por los están formada por distintos recursos: deployment, pods, service, routes
+
 •	Builds: Es el proceso por el que se crea la imagen desde la que se va a crear nuestra aplicación. Tenemos muchas estrategias: 
 	o	Desde una imagen, desde un fichero Dockerfile, …
+	
 	o	source2image
+	
 	o	Pipeline de Jenkins
+	
 	o	…
+	
 •	Registro de imágenes: Las imágenes que se crean en los builds se guardan en un registro interno.
+
 •	Deployment: Define las características de los contenedores que se van a crear para cada aplicación.
+
 •	Pods: Accedemos a la gestión de los pods que se han creado para nuestra aplicación.
+
 •	Services: Tenemos información del recurso servicio que nos permite acceder a nuestra aplicación.
+
 •	Routes: Se asocia automática una ruta (nombre) para acceder a cada aplicación.
+
 •	Monitorig: Tenemos acceso a herramienta para monitorizar el uso de recurso de nuestra aplicación.
-•	cli oc:Herramienta de línea de comandos que nos permite trabajar con nuestros recursos de OpenShift
+
+•	cli oc: Herramienta de línea de comandos que nos permite trabajar con nuestros recursos de OpenShift
+
 
 ## Tolerancia a fallos y balanceo de carga
 Openshift va a asegurar que en todo momento se esté ejecutando nuestra aplicación. Para ello asegura la ejecución de los pods que hayamos indicado para ejecutar la aplicación.
@@ -88,12 +105,17 @@ Vemos un ejemplo de tolerancia a fallos:
 # Escalabilidad
 En cualquier momento se puede escalar de forma horizontal (crear más pods en un despliegue o eliminarlos) los pods de un despliegue. En todo momento las peticiones a nuestra aplicación se balancean entre los pods que tengamos ejecutando.
 Antes de ver un ejemplo de tolerancia a fallos, vamos a señalar algunas funcionalidades que podemos obtener de los deploy: En la ruta Aplications->Deployments podemos escoger un determinado despliegue y a continuación el número de despliegue, y nos llevará a una página con la información de ese despliegue, entre lo más interesante podemos señalar:
+
 •	Details: Toda la información del despliegue.
+
 •	Metrics: Las métricas (uso de memoria y de CPU) del despliegue.
+
 •	Logs: Terminal donde podemos ver en tiempo real los logs que se producen en el despliegue.
+
 
 Veamos un ejemplo de escalado manual:
 1.	Desde la pestaña Details podemos observar una grágica donde vemos el número de pods actuales, con dos flechas que nos permiten el escalado.
+
 2.	Podemos aumentar y disminuir el número de pods interactuando con las dos flechas y podemos observar cómo se crean y eliminan los pods.
 
 # Balanceo de carga
@@ -126,9 +148,13 @@ Servidor:ejemplo1-1-8flgl
 # Despliegue continuo y rollback de nuestra aplicación Openshift
 Actualizaciones continúas
 El ciclo de vida del desarrollo de nuestra aplicación sería el siguiente:
+
 1.	Modificamos el código de nuestra aplicación, y guardamos los cambios en el repositorio.
+
 2.	Desde openshift realizamos un nuevo build, que construye una nueva imagen con la aplicación modificada.
+
 3.	A continuación, de forma automática, se realizará un nuevo deployment, que borrará los pods antiguos y creará nuevos desde la nueva versión de la imagen.
+
 Rollback de nuestra aplicación en OpenShift
 En cualquier momento podemos desplegar un deployment anterior, para volver a una versión anterior de nuestra aplicación.
 
@@ -147,15 +173,19 @@ Actualmente el autoescalado se realiza dependiendo del uso del CPU, aunque tambi
 Para crear el auescalado de un despliegue elegimos de la opción Deployments el despliegue que nos interesa y escogemos en el botón Actions la opción Add Autoescaler:
  
 Indicamos los siguientes datos:
+
 1.	El número mínimo de pods que vamos a tener de nuestra aplicación.
+
 2.	El número máximo de pods que vamos a tener de nuestra aplicación.
+
 3.	El porcentaje de utilización de la CPU que se va a considerar para crear o eliminar un pod (Nota: Hemos puesto un valor pequeño para la prueba que vamos a realizar).
+
 Como podemos observar en un principio tenemos un sólo pod:
- 
 Si empezamos a hacer peticiones a nuestra aplicación, por ejemplo hacemos 50 peticiones concurrentes durante un minuto:
+
 ```
 ab -t 60 -c 50 -k http://prueba-myproyecto1.7e14.starter-us-west-2.openshiftapps.com/
- ```
+```
 ab es del paquete apache2-utils para hacer pruebas de peticiones
 Pasado unos segundos observaremos como de forma automática se crean nuevos pods de nuestra aplicación, hasta llegar al límite superior indicado:
 
@@ -167,19 +197,28 @@ Por ejemplo para Linux Debian/Ubuntu, descomprimimos el fichero y copiamos el ej
 Conectando a nuestra cuenta de OpenShift
 Una vez instalado, debemos conectarnos a nuestro clúster. Para ello vamos a utilizar un token de acceso. Lo más sencillo es obtener el token desde la página web eligiendo la opción Copy Login Command desde las opciones de tu usuario.
 Pegamos en la línea de comando y obtenemos el comando para conectarnos a nuestro clúster:
-oc login https://api.starter-us-west-2.openshift.com --token=xxxxxxxxxxxxxxx.....
-Cuando nos conectamos por primera vez se crea un fichero de configuración en ~/.kube/config con la información de acceso al clúster.
-Creación de un nuevo proyecto
-Si accedemos al clúster y no tenemos creado un proyecto tenemos que ejecutar la siguiente instrucción para crear uno:
-oc new-project miproyecto1
-Y podemos comprobar el estado del clúster con:
-oc status
-In project miproyecto1 on server https://api.starter-us-west-2.openshift.com:443
 
+ ```
+oc login https://api.starter-us-west-2.openshift.com --token=xxxxxxxxxxxxxxx.....
+ ```
+ 
+Cuando nos conectamos por primera vez se crea un fichero de configuración en ~/.kube/config con la información de acceso al clúster.
+
+- Creación de un nuevo proyecto
+
+Si accedemos al clúster y no tenemos creado un proyecto tenemos que ejecutar la siguiente instrucción para crear uno:
+ ```
+oc new-project miproyecto1
+ ```
+Y podemos comprobar el estado del clúster con:
+ ```
+oc status
+ In project miproyecto1 on server https://api.starter-us-west-2.openshift.com:443
 You have no services, deployment configs, or build configs.
 Run 'oc new-app' to create an application.
-
-Despliegue de una aplicación con OC
+ ```
+ 
+## Despliegue de una aplicación con OC
 
 Una vez que nos hemos conectado a nuestro cluster y hemos creado un proyecto, vamos a crear nuestra aplicación. En este caso, volvemos a desplegar la misma aplicación que en el ejemplo anterior, usando source2image.
 Para ver todos recursos del catálogo que podemos utilizar:
@@ -191,7 +230,7 @@ Seguimos los mismos pasos, del catálogo elegimos la imagen de php y la versión
 $ oc new-app --search php
 ```
 
- Las image stream son las que tiene disponibles Openshift
+Las image stream son las que tiene disponibles Openshift
 A continuación creamos la nueva aplicación indicando la imagen, el repositorio donde esta el código e indicando un nombre:
 ```
 $ oc new-app php:7.1~https://github.com/josedom24/html_for_openshift.git --name prueba
@@ -336,24 +375,32 @@ $ oc describe hpa/prueba
 Vamos a desplegar una aplicación python que tenemos guardada en el repositorio: https://github.com/josedom24/python_for_openshift
 Despliegue desde la consola web
 Para realizar el despliegue seguimos los siguientes pasos desde la consola web:
+
 1.	Al crear nuestra aplicación, escogemos en el catálogo la opción de imagen python.
+
 2.	Escogemos la versión de python e indicamos el repositorio de nuestra aplicación.
+
 3.	Durante el despliegue se van a instalar los módulos que encuentre en el fichero requirements.txt.
+
 4.	El contenedor que vamos a crear ejecuta por defecto una aplicación qie se llama app.py.
+
 Despliegue con el cliente de comandos oc
 Borramos el proyecto anterior, y creamos uno nuevo. Y a continuación vamos a realizar el despliegue de la aplicación python de nuevo. Lo primero es buscar las imágenes python que tenemos en el catálogo:
+ ```
 $ oc new-app --search python
+ ```
 A continuación creamos la aplicación:
+ ```
 $ oc new-app python:3.6~https://github.com/josedom24/python_for_openshift --name app-python
 Podemos ver el estado de nuestra aplicación ejecutando:
 $ oc status
 In project miproyecto1 on server https://api.starter-us-west-2.openshift.com:443
-
 svc/app-python - 172.30.85.230:8080
   dc/app-python deploys istag/app-python:latest <-
     bc/app-python source builds https://github.com/josedom24/python_for_openshift on openshift/python:3.6 
     deployment #1 deployed 16 seconds ago - 1 pod
-	
+ ```
+ 
 Para terminar tenemos que crear la ruta de acceso a la aplicación:
 ```
 $ oc expose svc/app-python
@@ -367,12 +414,18 @@ Y accediendo a la URL podremos ver nuestra aplicación.
 Despliegue de aplicaciones PHP con OC
 Vamos a instalar un CMS PHP que utiliza una base de datos Sqlite (phpSQLiteCMS). Para ello vamos a utilizar el código de la aplicación que se encuentra en el repositorio: https://github.com/ilosuna/phpsqlitecms
 Despliegue desde la consola web
+
 Vamos a seguir los siguientes pasos desde la consola web:
+
 1.	Al crear nuestra aplicación, escogemos en el catálogo la opción de imagen PHP.
+
 2.	Escogemos la versión de PHP e indicamos el repositorio de nuestra aplicación.
+
 3.	Durante el despliegue se van a instalar los módulos que encuentre en el fichero composer.json.
+
 4.	El despliegue de la aplicación, creará un build que construirá una imagen con nuestra aplicación, posteriormente creará un deployment, encargado de crear los pods, y finalmente se creará un servicio y una ruta de acceso a la aplicación.
 Despliegue con el cliente de comandos oc
+
 Borramos el proyecto anterior, y creamos uno nuevo. Y a continuación vamos a realizar el despliegue de la aplicación php de nuevo. Para ello ejecutamos:
 ```
 $ oc new-app php:7.1~https://github.com/ilosuna/phpsqlitecms --name appphp
@@ -390,20 +443,27 @@ $ oc get routes
 NAME      HOST/PORT                                                     PATH        SERVICES   PORT       TERMINATION   WILDCARD
 appphp    appphp-miproyecto1.7e14.starter-us-west-2.openshiftapps.com             appphp     8080-tcp                 None
 ```
+
 Y accediendo a la URL podremos ver nuestra aplicación.
 Los contenedores son efímeros
 Como hemos comentado los contenedores son efímeros, la información que se guarda en ellos se pierde al eliminar el contenedor, además si tenemos varias replicas de una misma aplicación (varios pods) la información que se guarda en cada una de ellas es independiente. Vamos a comprobarlo:
+
 1.	En el directorio /cms/data se encuentran las bases de datos de la aplicación.
+
 2.	Cuando escalemos nuestra aplicación se va a crear otro pod con la base de datos inicial, en este nuevo pod no tenemos el mismo contenido que el original.
+
 3.	Si realizamos un nuevo despliegue los nuevos pods perderán los datos de la base de datos.
+
 4.	Necesitamos volúmenes persistentes
 
 ## Despliegue de aplicaciones PHP con almacenamiento persistente
 En este ejemplo vamos a utilizar un volumen (almacenamiento persistente) para guardar las bases de datos de la aplicación (que están guardadas en el directorio /cms/data). Vamos a continuar trabajando donde lo dejamos en la unidad anterior.
-Estrategia de despliegue
-En este momento tenemos instalado phpSQLiteCMS pero sin almacenamiento persistente. Para trabajar con almacenamiento persistente en el próximo paso vamos a crear un volumen, pero antes vamos a cambiar la estrategia de despliegue de la aplicación:
+Estrategia de despliegue. En este momento tenemos instalado phpSQLiteCMS pero sin almacenamiento persistente. Para trabajar con almacenamiento persistente en el próximo paso vamos a crear un volumen, pero antes vamos a cambiar la estrategia de despliegue de la aplicación:
+
 •	Por defecto la estrategia es Rolling: En este caso se crean los nuevos pods de la nueva versión del despliegue se comprueban que funcionan y posteriormente se eliminan los pods de la versión anterior.
+
 •	Nosotros deseamos que la estrategia sea Recreate: En esta situación se eliminan los pods de la versión actual y posteriormente se crean los nuevos pods de la nueva versión. Si vamos a trabajar con volúmenes, necesitamos configurar este tipo de estrategia, ya que la primera nos da errores al intentar conectar el volumen a un nuevo pod cuando sigue conectado al anterior pod.
+
 Para cambiar la estrategia: Elegimos el despliegue de appphp y en el botón Actions elegimos la opción Edit:
  
 ### Creación del volumen
@@ -412,9 +472,13 @@ A continuación vamos a crear un nuevo volumen:
 Al crear el volumen tenemos que elegir entre varios medio de almacenamiento (Storage Class). Las posibilidades de medios de almacenamiento dependerán de la infraestructura donde está instalado OpenShift. Como medios de almacenamiento podemos tener: NFS, HostPath, GlusterFS, Ceph RBD, OpenStack Cinder, AWS Elastic Block Store (EBS), GCE Persistent Disk, iSCSI, Fibre Channel,…
 OpenShiftOnline está instalado en AWS por lo que tenemos dos medios de almacenamiento: ebs: Elastic Block Store que proporciona volúmenes de almacenamiento, y gp2-encrypted, similar al anterior pero la información está cifrada.
 Dependiendo del medio de almacenamiento que tenga nuestra infraestructura tendremos distintas formas de acceso a la información guardada en el volumen:
+
 •	ReadWriteOnce: lectura y escritura solo para un nodo (RWO)
+
 •	ReadOnlyMany: solo lectura para muchos nodos (ROX)
+
 •	ReadWriteMany: lectura y escritura para muchos nodos (RWX)
+
 Por ejemplo los volúmenes de tipo ebs no soportan el modo ReadWriteMany, por consecuencia, si tenemos un despliegue al que hemos conectado un volumen con tipo de acceso ReadWriteOnce, este despliegue no podrá replicarse, es decir no podemos tener varios pods replicados ya que no podríamos montar el volumen al mismo tiempo en los distintos pods.
 En la siguiente tabla podemos ver la relación entre los medios de almacenamiento y los tipos de acceso para cada uno de los proveedores cloud que soportan:
 En todos ellos al menos un pod podrá acceder al volumen, si esto no existe no podremos dar la posibilidad de elasticidad.
@@ -429,21 +493,28 @@ En el directorio cms/data de phpSQLiteCMS se guardan las bases de datos sqltile 
 Pero al montar el volumen en el directorio indicado, hemos perdido su contenido, y al acceder a la aplicación nos da un error:
  
 Para solucionarlo vamos a copiar las bases de datos desde nuestro ordenador:
-•	He clonado el repositorio de phpsqlitecms en mi ordenador:
-•	  $ git clone https://github.com/ilosuna/phpsqlitecms.git
-•	  $ cd phpsqlitecms/cms
-•	Vamos a copiar el contenido de este directorio al volumen, para ello:
-•	  $ oc get pods
-•	  NAME             READY     STATUS      RESTARTS   AGE
-•	  appphp-1-build   0/1       Completed   0          12m
-•	  appphp-2-tj5jm   1/1       Running     0          1m
-•	
-•	  $ oc cp data appphp-2-tj5jm:cms/
-•	Comprobamos que hemos copiado los ficheros:
- $ oc exec appphp-2-tj5jm ls cms/data
+
+He clonado el repositorio de phpsqlitecms en mi ordenador:
+ ```
+$ git clone https://github.com/ilosuna/phpsqlitecms.git
+$ cd phpsqlitecms/cms
+```
+Vamos a copiar el contenido de este directorio al volumen, para ello:
+ ```
+$ oc get pods
+NAME             READY     STATUS      RESTARTS   AGE
+appphp-1-build   0/1       Completed   0          12m
+appphp-2-tj5jm   1/1       Running     0          1m
+
+$ oc cp data appphp-2-tj5jm:cms/
+ ```
+Comprobamos que hemos copiado los ficheros:
+ ```
+$ oc exec appphp-2-tj5jm ls cms/data
  content.sqlite
  entries.sqlite
  userdata.sqlite 
+ ```
  
 Podemos concluir que cada vez que hagamos un nuevo despliegue se creara de nuevo el sistema de fichero de los contenedores, a excepción del directorio cms/data cuya información esta guardada en el volumen.
 Ya podemos acceder a nuestra aplicación. Para terminar el ejercicio podemos comprobar que las modificaciones que hacemos en la configuración de la página se mantienen cuando se borran los pods, por ejemplo al crear un nuevo despliegue.
