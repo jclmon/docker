@@ -27,7 +27,7 @@ CONTAINER ID        IMAGE                COMMAND             CREATED            
 6c925b14a227        k8-hands-on:latest   "./app"             14 seconds ago      Up 11 seconds       0.0.0.0:9091->9090/tcp   k8s-hands-on
 ```
 
-### Busco el atributo del maniefesto PullPolicy para cambiarlo a ifnotpresent, esto hará que no se descargue
+### Busco el atributo del maniefesto imagePullPolicy para cambiarlo a ifnotpresent, esto hará que no se descargue
 ```
 \kubernetes\app\k8s-hands-on\backend> kubectl get deployments backend-k8s-hands-on -o yaml | grep -i PullPolicy
 -C 12

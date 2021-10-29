@@ -6,84 +6,74 @@
 
 ## Comandos básicos
 
-Versión
----
+### Versión
 ```
 docker version
 ```
-Bash interactivo
----
+### Bash interactivo
 ```
 docker run --interactive --tty centos bash
 ```
-Correr máquina
----
+### Correr máquina
 ```
 --run nginx
 docker run --detach --publish 80:80 --name webserver nginx
 ```
-Parar máquina
----
+### Parar máquina
 ```
 --stop webserver
  docker container stop webserver
- ```
- Descargar imagen
- ---
+```
+###  Descargar imagen
  ```
 --descargar imagen ver hub https://hub.docker.com/	
 docker pull sonarqube
-```
-Ver imagenes descargadas
----
+ ```
+### Ver imagenes descargadas
 ```
 --ver imagenes 
 docker images
 --ver imagenes independientemente del estado
 docker ps -a
 ```
-Levantar imagenes
----
+### Levantar imagenes
 ```
 docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube
 docker run -d --name sonarqube -p 9000:9000 sonarqube
 ```
-Parar
----
+### Parar
 ```
 docker stop sonarqube
 ```
-Conocer las IPS de las máquinas levantadas
----
+### Conocer las IPS de las máquinas levantadas
 ```
 docker inspect -f '{{.Name}} - {{.NetworkSettings.IPAddress }}' $(docker ps -aq)
 ```
-Eliminar contenedor
----
+### Eliminar contenedor
 ```
 docker ps -a
 docker rm ID_or_Name
 --lo borra aunque esté corriendo
 docker rm -fv ID_or_Name
 ```
-Eliminar imagen
----
+### Eliminar imagen
 ```
 docker ps
 docker rmi ID_or_Name
 ```
-Crear red 
----
+### Crear red 
 ```
 docker network create --driver=bridge --subnet=10.228.51.0/16 --ip-range=10.228.51.0/16 --gateway=10.228.51.254 app-network
 ```
-Importar máquina
+### Importar máquina
+
 ```
 docker load -i jbosseap63_centos7.tar
 ```
-Ejecutar maquina mapeo de carpetas
----
+### Ejecutar maquina mapeo de carpetas
 ```
+docker run --rm --name user-postgresdb-container -e -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data josecarloslopez/postgres-user:1.0
+
 docker run -d -v <ruta_local_despliegue>:/opt/jboss/jboss-eap-6.3/standalone/deployments -v <ruta_local_logs>:/var/log/jboss -i -t -p8081:8080 --name jbosseap1  jbosseap63:centos7 bash
 ```
 
@@ -112,18 +102,19 @@ docker logs --tail 100 web --Print the last 100 lines of a container's logs
 docker-compose up --Start the services defined in the dockercompose.yml file in the current folder
 docker-compose down --Stop the services defined in the docker-compose.yml file in the current folder
 ```
-Conectar por ssh a maquina
----
+### Conectar por ssh a maquina
 Use docker ps to get the name of the existing container
 Use the command docker exec -it <container name> /bin/bash to get a bash shell in the container
 Generically, use docker exec -it <container name> <command> to execute whatever command you specify in the container.
 
-## Stop all containers (powershell)
+### Stop all containers (powershell)
 ```
 docker ps -q | % { docker stop $_ }
 ```
-## Listar
+### Listar
 ```
 docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}"
 docker ps --format "table {{.Image}}\t{{.Ports}} \t{{.Names}}"
 ```
+
+![](docker_cheat_sheet.png)

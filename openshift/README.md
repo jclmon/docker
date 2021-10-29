@@ -1,6 +1,8 @@
 # OPENSHIFT
 
-# Creando el cluster openshift
+Red Hat OpenShift es la plataforma de Kubernetes empresarial líder en el sector*, la cual se diseñó especialmente para formar parte de una [estrategia de nube híbrida abierta](https://www.redhat.com/es/products/open-hybrid-cloud). Gracias a que ofrece operaciones automatizadas integrales, una  experiencia uniforme en todos los entornos y la implementación de  autoservicio para los desarrolladores, los equipos pueden trabajar en  conjunto para llevar las ideas de la etapa de desarrollo a la de  producción de manera más eficiente.
+
+## Creando el cluster openshift
 
 La inicialización del clúster crea una nueva máquina en nuestro virtualbox e instala en ella todas las aplicaciones necesarias para que funcione openshift (la versión que se va a instalar el openshift 3.11), la instrucción que tenemos que ejecutar para que se empiece a construir el clúster es la siguiente (el proceso dura algunos minutos):
 
@@ -23,29 +25,29 @@ To login as administrator:
 ```
 oc login -u system:admin
 ```
-	
-# Gestionando el cluster openshift
-## Para detener la máquina virtual que hemos creado:
+
+## Gestionando el cluster openshift
+### Para detener la máquina virtual que hemos creado:
 ```
 $ minishift stop
 ```
-## En cualquier otro momento podemos seguir trabajando con el cluster:
+### En cualquier otro momento podemos seguir trabajando con el cluster:
 ```
 $ minishift start
 ```
-## Para borrar la máquina virtual:
+### Para borrar la máquina virtual:
 ```
 $ minishift delete
 ```
 
-# Despliegue de la primera aplicación en Openshift
+## Despliegue de la primera aplicación en Openshift
 •	Vamos a crear una aplicación web con un servidor web apache2. Nuestra aplicación tendrá ficheros html y php.
 
 •	Nuestra aplicación la tenemos en un repositorio de GitHub (https://github.com/josedom24/html_for_openshift)
 
 •	Vamos a crear nuestra aplicación usando source2image: al crear la aplicación vamos a escoger una imagen con apache2 y php y vamos a indicar nuestro repositorio con el código, a partir de esta información se va a crear una imagen docker con apache2, php y nuestro código, que va a servir para desplegar la aplicación.
 
-## Pasos a seguir
+### Pasos a seguir
 1.	Del catálogo elegimos la imagen de php y elegimos la versión de php con la que vamos a trabajar.
 2.	Indicamos un nombre y el repositorio donde tenemos nuestro código.
 3.	Se va a crear un build: 
@@ -58,7 +60,7 @@ $ minishift delete
 	o	Y se crea una ruta de acceso.
 5.	Ya tenemos desplegada nuestra aplicación y podemos acceder a ella.
 
-## Recursos que nos ofrece Openshift
+### Recursos que nos ofrece Openshift
 •	Web Console: Aplicación web que nos permite trabajar con nuestros recursos de OpenShift
 
 •	Catálogo de servicios: Conjunto de imágenes y plantillas bases. A partir de ellas podemos construir (builds) nuevas imágenes con s2i.
@@ -75,7 +77,7 @@ $ minishift delete
 	o	Pipeline de Jenkins
 	
 	o	…
-	
+
 •	Registro de imágenes: Las imágenes que se crean en los builds se guardan en un registro interno.
 
 •	Deployment: Define las características de los contenedores que se van a crear para cada aplicación.
@@ -91,7 +93,7 @@ $ minishift delete
 •	cli oc: Herramienta de línea de comandos que nos permite trabajar con nuestros recursos de OpenShift
 
 
-## Tolerancia a fallos y balanceo de carga
+### Tolerancia a fallos y balanceo de carga
 Openshift va a asegurar que en todo momento se esté ejecutando nuestra aplicación. Para ello asegura la ejecución de los pods que hayamos indicado para ejecutar la aplicación.
 Antes de ver un ejemplo de tolerancia a fallos, vamos a señalar algunas funcionalidades que podemos obtener de los pods: En la ruta Aplications->Pods podemos escoger un determinado Pod, y nos llevará a la información del pod, entre lo más interesante podemos señalar:
 •	Details: Toda la información del pod.
@@ -102,7 +104,7 @@ Vemos un ejemplo de tolerancia a fallos:
 1.	Vamos a borrar el pod, eligiendo la opción Delete del botón Actions.
 2.	Inmediatamente se crea un nuevo pod que sustituye al anterior.
 
-# Escalabilidad
+### Escalabilidad
 En cualquier momento se puede escalar de forma horizontal (crear más pods en un despliegue o eliminarlos) los pods de un despliegue. En todo momento las peticiones a nuestra aplicación se balancean entre los pods que tengamos ejecutando.
 Antes de ver un ejemplo de tolerancia a fallos, vamos a señalar algunas funcionalidades que podemos obtener de los deploy: En la ruta Aplications->Deployments podemos escoger un determinado despliegue y a continuación el número de despliegue, y nos llevará a una página con la información de ese despliegue, entre lo más interesante podemos señalar:
 
@@ -118,7 +120,7 @@ Veamos un ejemplo de escalado manual:
 
 2.	Podemos aumentar y disminuir el número de pods interactuando con las dos flechas y podemos observar cómo se crean y eliminan los pods.
 
-# Balanceo de carga
+### Balanceo de carga
 Crear tres pods en nuestro despliegue y acceder al programa info.php que simplemente nos muestra el nombre del servidor en el que se está ejecutando:
 ```
 <?php echo "Servidor:"; echo gethostname();echo "\n"; ?>
@@ -145,7 +147,7 @@ Servidor:ejemplo1-1-nqc9j
 Servidor:ejemplo1-1-8flgl
 …
 ```
-# Despliegue continuo y rollback de nuestra aplicación Openshift
+## Despliegue continuo y rollback de nuestra aplicación Openshift
 Actualizaciones continúas
 El ciclo de vida del desarrollo de nuestra aplicación sería el siguiente:
 
@@ -158,20 +160,20 @@ El ciclo de vida del desarrollo de nuestra aplicación sería el siguiente:
 Rollback de nuestra aplicación en OpenShift
 En cualquier momento podemos desplegar un deployment anterior, para volver a una versión anterior de nuestra aplicación.
 
-## Despliegue continuo en Openshift
+### Despliegue continuo en Openshift
 Despliegue continuo:
 Copiamos el webhook de nuestra aplicación, lo incorporamos al proyecto de github en la pestaña de configuración, usar content type json:
 Tal y como se realiza el push de git con los cambios se dispara automáticamente el build:
 Para publicar nuestra ip interna y que github tenga acceso al webhook se puede utilizar https://ngrok.com/
 
-## Autoescalado, escalado automático en Openshift
+### Autoescalado, escalado automático en Openshift
 El autoescalado en OpenShift es una característica muy interesante. Con el autoescalado podemos tener un número mínimo de pods de nuestra aplicación y queremos que cuando esa “máquina” llegue a una determinada carga se cree un pod nuevo. Con ello realizamos un escalado horizontal y la carga de peticiones que estamos respondiendo se reparte entre más contenedores. En el momento en que baje la carga de peticiones se eliminaran los pods que no son necesarios.
 Actualmente el autoescalado se realiza dependiendo del uso del CPU, aunque también se está desarrollando la posibilidad de que la utilización de memoria sea el factor que realice el autoescalado.
 
 
-## Autoescalado de un despliegue
+### Autoescalado de un despliegue
 Para crear el auescalado de un despliegue elegimos de la opción Deployments el despliegue que nos interesa y escogemos en el botón Actions la opción Add Autoescaler:
- 
+
 Indicamos los siguientes datos:
 
 1.	El número mínimo de pods que vamos a tener de nuestra aplicación.
@@ -189,7 +191,7 @@ ab -t 60 -c 50 -k http://prueba-myproyecto1.7e14.starter-us-west-2.openshiftapps
 ab es del paquete apache2-utils para hacer pruebas de peticiones
 Pasado unos segundos observaremos como de forma automática se crean nuevos pods de nuestra aplicación, hasta llegar al límite superior indicado:
 
-# Introducción a la línea de comandos
+## Introducción a la línea de comandos
 Hasta ahora hemos manejado los recursos de nuestro cluster utilizando la página web de Openshift Online, pero también tenemos a nuestra disposición un comando CLI (command line interface) oc que podemos usar desde la línea de comandos.
 Instalación de la utilidad de línea de comandos oc
 Podemos bajarnos la última versión del cliente desde la página de descargas. Y siguiendo las instrucciones que encontramos en Get Started with the CLI (https://www.openshift.com/blog/installing-oc-tools-windows) podemos instalar la herramienta en los distintos sistemas operativos.
@@ -201,7 +203,7 @@ Pegamos en la línea de comando y obtenemos el comando para conectarnos a nuestr
  ```
 oc login https://api.starter-us-west-2.openshift.com --token=xxxxxxxxxxxxxxx.....
  ```
- 
+
 Cuando nos conectamos por primera vez se crea un fichero de configuración en ~/.kube/config con la información de acceso al clúster.
 
 - Creación de un nuevo proyecto
@@ -217,8 +219,8 @@ oc status
 You have no services, deployment configs, or build configs.
 Run 'oc new-app' to create an application.
  ```
- 
-## Despliegue de una aplicación con OC
+
+### Despliegue de una aplicación con OC
 
 Una vez que nos hemos conectado a nuestro cluster y hemos creado un proyecto, vamos a crear nuestra aplicación. En este caso, volvemos a desplegar la misma aplicación que en el ejemplo anterior, usando source2image.
 Para ver todos recursos del catálogo que podemos utilizar:
@@ -316,7 +318,7 @@ prueba-1-b4s25   1/1       Running     0          10s
 prueba-1-build   0/1       Completed   0          18m
 ```
 
-## Escalabilidad
+### Escalabilidad
 En cualquier momento se puede escalar de forma horizontal (crear más pods en un despliegue o eliminarlos) los pods de un despliegue. En todo momento las peticiones a nuestra aplicación se balancean entre los pods que tengamos ejecutando.
 ```
 $ oc scale dc prueba --replicas=3
@@ -336,7 +338,7 @@ Servidor:prueba-1-w4b4p
 Servidor:prueba-1-b4s25
 ...
 ```
-## Actualizaciones continúas
+### Actualizaciones continúas
 Modificamos el código de nuestra aplicación, y guardamos los cambios en el repositorio. Desde openshift realizamos un nuevo build, que construye una nueva imagen con la aplicación modificada:
 ```
 $ oc start-build bc/prueba
@@ -360,7 +362,7 @@ $ oc get dc
 NAME      REVISION   DESIRED   CURRENT   TRIGGERED BY
 prueba    3          3         1         config
 ```
-## Autoescalado
+### Autoescalado
 Para crear un autoescalado en un despliegue:
 ```
 $ oc autoscale dc/prueba --min 1 --max 3 --cpu-percent=20
@@ -400,7 +402,7 @@ svc/app-python - 172.30.85.230:8080
     bc/app-python source builds https://github.com/josedom24/python_for_openshift on openshift/python:3.6 
     deployment #1 deployed 16 seconds ago - 1 pod
  ```
- 
+
 Para terminar tenemos que crear la ruta de acceso a la aplicación:
 ```
 $ oc expose svc/app-python
@@ -465,10 +467,10 @@ Estrategia de despliegue. En este momento tenemos instalado phpSQLiteCMS pero si
 •	Nosotros deseamos que la estrategia sea Recreate: En esta situación se eliminan los pods de la versión actual y posteriormente se crean los nuevos pods de la nueva versión. Si vamos a trabajar con volúmenes, necesitamos configurar este tipo de estrategia, ya que la primera nos da errores al intentar conectar el volumen a un nuevo pod cuando sigue conectado al anterior pod.
 
 Para cambiar la estrategia: Elegimos el despliegue de appphp y en el botón Actions elegimos la opción Edit:
- 
+
 ### Creación del volumen
 A continuación vamos a crear un nuevo volumen:
- 
+
 Al crear el volumen tenemos que elegir entre varios medio de almacenamiento (Storage Class). Las posibilidades de medios de almacenamiento dependerán de la infraestructura donde está instalado OpenShift. Como medios de almacenamiento podemos tener: NFS, HostPath, GlusterFS, Ceph RBD, OpenStack Cinder, AWS Elastic Block Store (EBS), GCE Persistent Disk, iSCSI, Fibre Channel,…
 OpenShiftOnline está instalado en AWS por lo que tenemos dos medios de almacenamiento: ebs: Elastic Block Store que proporciona volúmenes de almacenamiento, y gp2-encrypted, similar al anterior pero la información está cifrada.
 Dependiendo del medio de almacenamiento que tenga nuestra infraestructura tendremos distintas formas de acceso a la información guardada en el volumen:
@@ -482,23 +484,23 @@ Dependiendo del medio de almacenamiento que tenga nuestra infraestructura tendre
 Por ejemplo los volúmenes de tipo ebs no soportan el modo ReadWriteMany, por consecuencia, si tenemos un despliegue al que hemos conectado un volumen con tipo de acceso ReadWriteOnce, este despliegue no podrá replicarse, es decir no podemos tener varios pods replicados ya que no podríamos montar el volumen al mismo tiempo en los distintos pods.
 En la siguiente tabla podemos ver la relación entre los medios de almacenamiento y los tipos de acceso para cada uno de los proveedores cloud que soportan:
 En todos ellos al menos un pod podrá acceder al volumen, si esto no existe no podremos dar la posibilidad de elasticidad.
- 
+
 ### Añadir el volumen a un despliegue
 En el Pod que se está ejecutando tenemos el terminal, de ahí vemos que la ruta donde se almacenan los ficheros de SQLite son las siguientes:
- 
+
 El volumen que hemos creado lo conectamos al despliegue appphp en el directorio /opt/app-root/src/cms/data: Elegimos el despliegue de appphp y en el botón Actions elegimos la opción Add Storage:
- 
+
 En el momento que hemos añadido el almacenamiento a nuestra aplicación se produce un nuevo despliegue de forma automática que implantará la aplicación con el volumen persistente.
 En el directorio cms/data de phpSQLiteCMS se guardan las bases de datos sqltile de la aplicación. Por lo tanto es el directorio que necesitamos que este guardado en un volumen persistente.
 Pero al montar el volumen en el directorio indicado, hemos perdido su contenido, y al acceder a la aplicación nos da un error:
- 
+
 Para solucionarlo vamos a copiar las bases de datos desde nuestro ordenador:
 
 He clonado el repositorio de phpsqlitecms en mi ordenador:
  ```
 $ git clone https://github.com/ilosuna/phpsqlitecms.git
 $ cd phpsqlitecms/cms
-```
+ ```
 Vamos a copiar el contenido de este directorio al volumen, para ello:
  ```
 $ oc get pods
@@ -515,18 +517,18 @@ $ oc exec appphp-2-tj5jm ls cms/data
  entries.sqlite
  userdata.sqlite 
  ```
- 
+
 Podemos concluir que cada vez que hagamos un nuevo despliegue se creara de nuevo el sistema de fichero de los contenedores, a excepción del directorio cms/data cuya información esta guardada en el volumen.
 Ya podemos acceder a nuestra aplicación. Para terminar el ejercicio podemos comprobar que las modificaciones que hacemos en la configuración de la página se mantienen cuando se borran los pods, por ejemplo al crear un nuevo despliegue.
 
 Despliegue de aplicaciones PHP en OpenShift con almacenamiento persistente
 Desde Openshift se pueden desplegar aplicaciones con distintas bases de datos:
- 
+
 Desde línea de comandos
 Buscamos los templates relacionados con mysql
- 
+
 ### Creamos la BBDD
- 
+
 Conecto con la BBDD y compruebo que se ha creado. Despliegue de una base de datos mysql sin almacenamiento persistente
 Lo primero que vamos a hacer es buscar en el catálogo los recursos que podemos desplegar relacionados con mysql:
 ```
@@ -652,13 +654,13 @@ En esta unidad vamos a instalar WordPress, un CMS escrito en PHP, en OpenShift a
 
 ### Creación de la base de datos
 Vamos a crear un nuevo proyecto y en ella vamos a crear una aplicación con la base de datos mysql. Para ellos escogemos en el catálogo la imagen de mysql e indicamos las variables para su creación:
- 
+
 ### Despliegue de WordPress
 A continuación vamos a crear una aplicación PHP con el despliegue de WordPress para ello vamos a utilizar el repositorio oficial de la aplicación:
 https://github.com/WordPress/WordPress:
- 
+
 A continuación, antes de trabajar con el volumen, y como explicábamos en unidades anteriores vamos a cambiar la estrategia de despliegue, para ello elegimos el despliegue de wordpress y en el botón Actions elegimos la opción Edit:
- 
+
 ### Creación del volumen
 A continuación vamos a crear un nuevo volumen:
 Y lo conectamos al despliegue wordpress en el directorio /opt/app-root/src/wp-content: Elegimos el despliegue de wordpress y en el botón Actions elegimos la opción Add Storage:

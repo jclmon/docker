@@ -8,7 +8,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
 
 Debe estar creado con el Administrador de Hyper-V el conmutador virtual VM-External-Switch como external a la red del equipo (eth0 o wlan)
 ```
-minikube start --vm-driver "hyperv" --hyperv-virtual-switch "VM-External-Switch"
+minikube start --vm-driver "hyperv" --hyperv-virtual-switch "VM-External-Switch" --memory 4096m
 ```
 ### Si hubiese algún problema:
 * Minikube delete
@@ -251,12 +251,21 @@ REVISION  CHANGE-CAUSE
 ```
 
 # SERVICES
-Es un objeto aislado que observa los pods con un label configurado, el servicio mantendrá una IP única para realizar entre otras cosas consulta de estado a los pods. Además el servicio hace balanceo de 
-carga realizando peticiones en principio con aplicando round-robin. Esto lo hará independientemente de que el pod esté incluido en un replicaset.
+Es un objeto aislado que observa los pods con un label configurado, el servicio mantendrá una IP única para realizar entre otras cosas consulta de estado a los pods. Además el servicio hace balanceo de carga realizando peticiones en principio con aplicando round-robin. Esto lo hará independientemente de que el pod esté incluido en un replicaset.
 
 Lo realiza independientemente de que los pods caigan y se levanten con la probabilidad de que cambie la IP de este. Los servicios realizan esto utilizando ENDPOINTS ya que mapea las IPS con los labels.
 
+La diferencia fundamental entre un deployment y un service está en su funcionalidad.  El servicio permite el acceso a la red a un conjunto de Pods (actuando  como un proxy). El Deployment se utiliza para mantener un conjunto de  Pods en ejecución mediante la creación de Pods a partir de una  plantilla.
+
 Los tipos de servicio son: ClusterIP, NodePort y LoadBalancer
+
+ **ClusterIP** : Expone el servicio en una  IP interna del clúster. La elección de este valor hace que el servicio  solo sea accesible desde dentro del clúster. Este es el tipo de servicio predeterminado
+
+ **NodePort** : Expone el servicio en la IP de cada Nodo en un puerto estático (el NodePort). Se crea  automáticamente un servicio ClusterIP, al que se enrutará el servicio  NodePort. Podrá contactar con el servicio NodePort, desde fuera del  clúster, solicitando <NodeIP>:<NodePort>.
+
+ **LoadBalancer** : Expone el servicio externamente usando el balanceador de carga de un proveedor de la nube. Los servicios NodePort y ClusterIP, a los que se  enrutará el equilibrador de carga externo, se crean automáticamente.
+
+Al utilizar NodePort abrimos un puerto específico en todos los hosts y  se reenvía el tráfico directamente al servicio, y a los Pods.
 
 ```
 > kubectl get svc
@@ -469,49 +478,139 @@ No LimitRange resource.
 
 # PROBES
 Pruebas de diagnóstico sobre los pods
+
 Kubelet es quien sondea con probes a los pods, esto lo hace:
+
 1.	Comando: se ejecuta un comando si devuelve 0 está OK si no no
 2.	TCP: testeo de puerto, si responde OK si no no
 3.	HTTP: hace un get sobre /path y si la respuesta es entre 200 y 399 es OK si no no
 Tipos, cualquiera de ellos se ejecuta a través de Comando, TCP o HTTP: 
 
-* Liveness 
-Diagnóstico para ver si la aplicación funciona como debería, se ejecuta cada n intervalo de tiempo.
+* **Liveness** 
 
-* Readiness 
-La aplicación se inició como debería, si levanto un pod hasta que no esté listo no se utiliza como 
-endpoint no se incorporará al servicio. Si el puerto no está abierto desregistra la IP de los endpoints de servicio para que el pod no reciba más carga hasta que no esté en un estado correcto.
+  Diagnóstico para ver si la aplicación funciona como debería, se ejecuta cada n intervalo de tiempo.
 
-* Startup
-Aplicaciones que se retrasan en el inicio, se ejecuta el primero Liveness y Readiness tienen que 
-esperarlo se pausan. Esperarán hasta que estemos seguros de que la aplicación está lista.
+  Con liveness probes podemos configurar un check y decidir cuándo  considerar que el pod está «vivo». Para ello podemos introducir en  nuestro fichero yaml una configuración como la siguiente:
 
-## Liveness
-```
-\kubernetes\probes> kubectl apply -f .\liveness.yml
-\kubernetes\probes> kubectl describe pod liveness
-...
-  Type     Reason     Age                  From               Message
-  ----     ------     ----                 ----               -------
-  Normal   Scheduled  <unknown>            default-scheduler  Successfully assigned default/liveness-exec to minikube
-  Warning  Unhealthy  50s (x6 over 2m20s)  kubelet, minikube  Liveness probe failed: cat: can't open '/tmp/healthy': No such file or directory
-  Normal   Killing    50s (x2 over 2m10s)  kubelet, minikube  Container liveness failed liveness probe, will be restarted
-  Normal   Pulling    19s (x3 over 3m)     kubelet, minikube  Pulling image "k8s.gcr.io/busybox"
-  Normal   Pulled     17s (x3 over 2m55s)  kubelet, minikube  Successfully pulled image "k8s.gcr.io/busybox"
-  Normal   Created    16s (x3 over 2m54s)  kubelet, minikube  Created container liveness
-  Normal   Started    15s (x3 over 2m53s)  kubelet, minikube  Started container liveness
+  ```
+  livenessProbe:
+    httpGet:
+      path: /live.php
+      port: 8080
+      httpHeaders:
+        - name: X-Custom-Header
+          value: Live
+    initialDelaySeconds: 30
+    timeoutSeconds: 3
+  ```
 
-\kubernetes\probes> kubectl apply -f .\liveness-tcp.yml  
+  ```
+  kubernetes\probes> kubectl apply -f .\liveness.yml
+  \kubernetes\probes> kubectl describe pod liveness
+  ...
+    Type     Reason     Age                  From               Message
+    ----     ------     ----                 ----               -------
+    Normal   Scheduled  <unknown>            default-scheduler  Successfully assigned default/liveness-exec to minikube
+    Warning  Unhealthy  50s (x6 over 2m20s)  kubelet, minikube  Liveness probe failed: cat: can't open '/tmp/healthy': No such file or directory
+    Normal   Killing    50s (x2 over 2m10s)  kubelet, minikube  Container liveness failed liveness probe, will be restarted
+    Normal   Pulling    19s (x3 over 3m)     kubelet, minikube  Pulling image "k8s.gcr.io/busybox"
+    Normal   Pulled     17s (x3 over 2m55s)  kubelet, minikube  Successfully pulled image "k8s.gcr.io/busybox"
+    Normal   Created    16s (x3 over 2m54s)  kubelet, minikube  Created container liveness
+    Normal   Started    15s (x3 over 2m53s)  kubelet, minikube  Started container liveness
+  
+  \kubernetes\probes> kubectl apply -f .\liveness-tcp.yml  
+  
+  \kubernetes\probes> kubectl describe pod goproxy
+  Name:         goproxy
+  ...
+  \kubernetes\probes> kubectl get pods liveness-http -o yaml | grep -i liv -A12
+        {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"test":"liveness"},"name":"liveness-http","namespace":"default"},"spec":{"containers":[{"args":["/server"],"image":"k8s.gcr.io/liveness","livenessProbe":{"httpGet":{"httpHeaders":[{"name":"Custom-Header","value":"Awesome"}],"path":"/healthz","port":8080},"initialDelaySeconds":3,"periodSeconds":3},"name":"liveness"}]}}
+    creationTimestamp: "2020-02-24T15:44:23Z"
+    labels:
+      test: liveness
+  ```
 
-\kubernetes\probes> kubectl describe pod goproxy
-Name:         goproxy
-...
-\kubernetes\probes> kubectl get pods liveness-http -o yaml | grep -i liv -A12
-      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"test":"liveness"},"name":"liveness-http","namespace":"default"},"spec":{"containers":[{"args":["/server"],"image":"k8s.gcr.io/liveness","livenessProbe":{"httpGet":{"httpHeaders":[{"name":"Custom-Header","value":"Awesome"}],"path":"/healthz","port":8080},"initialDelaySeconds":3,"periodSeconds":3},"name":"liveness"}]}}
-  creationTimestamp: "2020-02-24T15:44:23Z"
-  labels:
-    test: liveness
-```
+  
+
+* **Readiness** 
+
+  La aplicación se inició como debería, si levanto un pod hasta que no esté listo no se utiliza como endpoint no se incorporará al servicio. Si el puerto no está abierto desregistra la IP de los endpoints de servicio para que el pod no reciba más carga hasta que no esté en un estado correcto.
+
+  Readiness probes las podemos usar para comprobar que el pod realiza las  tareas para las que está configurado. Por ejemplo, podemos ejecutar un  comando y dependiendo del resultado que nos devuelva, considerar que es  correcto o no., como en el siguiente ejemplo:
+
+  ```
+  readinessProbe:
+    exec:
+      command:
+          - /usr/local/bin/checker
+          - --full-check
+          - --data-service=hue-multimedia-service
+      initialDelaySeconds: 60
+      timeoutSeconds: 5
+  ```
+
+* **Startup**
+  Aplicaciones que se retrasan en el inicio, se ejecuta el primero Liveness y Readiness tienen que esperarlo se pausan. Esperarán hasta que estemos seguros de que la aplicación está lista.
+
+  <u>Exec Probe</u>
+
+  Ejecuta un comando dentro del contenedor como un heatlh check
+
+          startupProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 1
+            exec:
+              command:
+              - cat
+              - /etc/nginx/nginx.conf
+
+  <u>TCP Probe</u>
+
+  Comprueba si el puerto específico está abierto o no
+
+          startupProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 1
+            tcpSocket:
+              host:
+              port: 80
+
+  <u>HTTP Probe</u>
+
+  Envia una petición HTTP GET con unos parámetros definidos
+
+      host: Host/IP to connect to (default: pod IP)
+      scheme: Scheme to use when making the request (default: HTTP)
+      path: Path
+      httpHeaders: An array of headers defined as header/value tuples.
+      port: Port to connect to
+      
+      Tip: Host header should be set in httpHeaders.
+      
+          startupProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 1
+            httpGet:
+              host:
+              scheme: HTTP
+              path: /
+              httpHeaders:
+              - name: Host
+                value: myapplication1.com
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+
 
 # CONFIGMAP
 Maneja el versionado de dockerfiles, separa las configuraciones para hacer más portable los Pods, la configuración no se hace hardcoded en el Pod si no que se hace en el ConfigMap.
@@ -614,7 +713,7 @@ Los VolMounts se asocian a estos volúmenes, hay que especificar el Id del volum
 PV (PersistentVolume) Guarda: Nombre, Tamaño, Aprovisionador (AWS, Google Cloud) y pide estas características al aprovisionador.
 PVC (PersistentVolumeClaim), reclamación de volumen persistente, lo que reclama es un PV al recurso Cloud. Reclamación directa al espacio del PV que solicita a su vez el espacio en el Cloud. Utiliza selector a través de labels para identificar los PV.
 
-## PV
+## Persistent Volume (PV)
 ```
 \kubernetes\volumes> kubectl apply -f .\pv-pvc.yaml
 persistentvolume/task-pv-volume created
@@ -673,3 +772,7 @@ NAME              CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM  
 task-pv-volume    10Gi       RWO            Retain           Available                            manual                  27s   type=local
 task-pv-volume2   10Gi       RWO            Retain           Bound       default/task-pv-claim2   manual                  27s   mysql=ready1
 ```
+
+
+
+![](kubernetes-cheat-sheet-1.png)

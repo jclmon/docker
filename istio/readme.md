@@ -1,4 +1,6 @@
-# ISTIO
+# ISTIO el service mesh del futuro
+
+[Istio](https://istio.io/) es una plataforma de [red de servicios](https://www.redhat.com/es/topics/microservices/what-is-a-service-mesh) con tecnología de open source, que permite controlar el intercambio de datos entre los [microservicios](https://www.redhat.com/es/topics/microservices/what-are-microservices). Incluye [API](https://www.redhat.com/es/topics/api/what-are-application-programming-interfaces) que le permiten [integrarse](https://www.redhat.com/es/topics/integration/what-is-integration) a cualquier plataforma de registro, telemetría o sistema de políticas.  El diseño de esta plataforma facilita su ejecución en distintos  entornos: on-premise, alojados en la nube, en [contenedores](https://www.redhat.com/es/topics/containers) de [Kubernetes](https://www.redhat.com/es/topics/containers/what-is-kubernetes) y en servicios que se ejecutan en [máquinas virtuales](https://www.redhat.com/es/topics/virtualization/what-is-a-virtual-machine), entre otros.
 
 •	Los Microservicios añaden complejidad en la red
 
@@ -8,49 +10,47 @@
 
 •	Los Service Meshes solucionan el problema
 
-•	Istio el service mesh del futuro
+## INSTALACION
 
-# INSTALACION
-
-## Arrancar minikube
+### Arrancar minikube
 ```
 minikube start --cpus 2 --memory 8192
 ```
-## Instalar Istio
+### Instalar Istio
  ```
 curl -L https://istio.io/downloadIstio | sh -
 cd istio-1.5.2/
 istioctl manifest apply --set profile=demo
 kubectl label namespace default istio-injection=enabled
-```
-## Comprobar instalación
+ ```
+### Comprobar instalación
 ```
 kubectl get namespaces | grep istio
 ```
 
-# TUTORIAL
+## TUTORIAL
 
 Desplegar nuestra aplicación basada en microservicios a Kubernetes dentro de la service mesh. Además se explica cómo exponer un servicio.
 
-## Crear namespace tutorial
+### Crear namespace tutorial
 ```
 kubectl create namespace tutorial
 ```
-## Hacer el clone del proyecto
+### Hacer el clone del proyecto
 ```
 git clone https://github.com/jclmon/istio-tutorial
 cd istio-tutorial/customer/java/springboot/
 ```
-## Empaquetado del proyecto
+### Empaquetado del proyecto
 ```
 export JAVA_TOOL_OPTIONS="-Dhttps.protocols=TLSv1.2"
 mvn clean package
 ```
-## Asociar a istio el entorno de docker
+### Asociar a istio el entorno de docker
 ```
 eval $(minikube -p istio docker-env)
 ```
-## Construcción del proyecto
+### Construcción del proyecto
 ```
 docker build -f Dockerfile -t example/customer .
 istioctl kube-inject -f ../../kubernetes/Deployment.yml | kubectl apply -n tutorial -f -
@@ -74,7 +74,7 @@ docker build -f Dockerfile -t example/recommendation:v2 .
 istioctl kube-inject -f ../../kubernetes/Deployment-v2.yml | kubectl apply -n tutorial -f -
 ```
 
-## Exponer los servicios, redirección de puertos
+### Exponer los servicios, redirección de puertos
 ```
 kubectl port-forward $(kubectl get pod -n tutorial | grep "customer" | awk '{ print $1 }') -n tutorial 8080:8080
 ```
@@ -89,10 +89,11 @@ recommendation-v2-5b956bd67f-r9dvg   2/2     Running   0          5m31s
 $ kubectl port-forward customer-55c8cc5979-fnkg5 8080:8080
 ```
 
-# BLUEGREEN DEPLOYMENT
+## BLUEGREEN DEPLOYMENT
 
-Fichero Istio para despliegue de dos versiones como DestinationRule destination-rule-recommendation-v1-v2.yml
-Ahora lo que se requiere es que todo el tráfico se redirija a la versión 2.
+Fichero Istio para despliegue de dos versiones como DestinationRule destination-rule-recommendation-v1-v2.yml 
+
+Ahora lo que se requiere es que todo el tráfico se redirija a la versión 2
 
 Para ello se crea el fichero:
 ``` 
@@ -157,7 +158,7 @@ Reemplazo:
 isitioctl replace –f istiofiles/virtual-service-recommendation-v1.yml -n tutorial
 ```
 
-# CANARY RELEASE
+## CANARY RELEASE
 No manda el 100% del tráfico a una versión o a otra, el cambio se va haciendo incrementalmente desde la versión 1 a la versión 2
 Creo el fichero para un 50 - 50
 ```
@@ -186,7 +187,7 @@ istioctl create –f istiofiles/virtual-service-recommendation-v1_and_v2_50_50.y
 istioctl get virtualservices –n tutorial
 ```
 
-# CONTROL DE TRAFICO POR CONTENIDO
+## CONTROL DE TRAFICO POR CONTENIDO
 Redirecciona el tráfico según el contenido de los paquetes y no por porcentaje. El contenido estará contenido en el header de HTTP
 En el ejemplo user agent que identifica al navegador para safari pasa por la versión 2.
 Creo el fichero:
@@ -220,7 +221,7 @@ curl -A Safari customer-tutorial.$(minishift ip).nip.io
 curl -A Firefox customer-tutorial.$(minishift ip).nip.io
 ```
 
-# DARK LAUNCHERS SHADOWING TRAFIC MIRRORING TRAFIC
+## DARK LAUNCHERS SHADOWING TRAFIC MIRRORING TRAFIC
 Se podría monitorizar para que la respuesta la de la versión 1 pero también las peticiones se envíen a la versión 2 con el fin de probar cual es su respuesta. Al cliente se le envía la respuesta de la versión 1.
 Se ejecutarán las dos versiones las dos recibirán las request.
 ``` 
@@ -238,7 +239,7 @@ spec:
       version: v2
     name: version-v2
 ---
-``` 
+```
 Creamos la imagen:
 ``` 
 kubectl create -f .\destination-rule-recommendation-v1-v2.yml
@@ -256,13 +257,12 @@ kubectl describe destinationrules recommendation -n tutorial
     Name:       version-v2
 Events:         <none>
 ```
-Ver los logs
----
+### Ver los logs
 ```
 kubectl logs -f `kubectl get pods | grep recommmendation-v2 | awk '{print $1}'` -c recommendation
 ```
 
-# EGRESS
+## EGRESS
 Acceso a servicios externos al cluster, se crean reglas egress que configura que tráfico permitimos para salida de istio.
 Por ejemplo usamos este servicio que nos proporciona la hora:
 ```
@@ -287,7 +287,7 @@ Creamos la imagen:
 kubectl create -f .\service-entry-egress-worldclockapi.yml
 ```
 
-# SERVICIOS RESILENTES
+## SERVICIOS RESILENTES
 - Circuit breaker, estados del servicio circuit breaker (Closed, Open, Half Open)
 - El reset timeout es el tiempo que tenemos para revisar de nuevo la conexión.
 - Cuando el circuito está abierto podemos responder con un valor determinado. 
@@ -366,10 +366,11 @@ Reemplazo el destination rule:
 ```
 istioctl replace –f istiofiles/destination-rules-cb_policy_version_v2.yml
 ```
- 
+
 ## POOL EJECTION
 Si uno de los pods del pool comienza a devolver errores valores 500 de HTTP
 Reescalamos el pool de recursos de la versión 2
+
 ```
 kubectl scale deployment recommendation-v2 –replicas=2 –n tutorial 
 kubectl get pods –l app=recommendation,versión=v2
@@ -448,7 +449,7 @@ spec:
 # TESTING
 Pruebas sobre el mesh.
 
-## TESTING CAOTICO
+### TESTING CAOTICO
 Inyectamos errores en las invocaciones para ver la respuesta del service mesh.
 El 50% de los request a recommedation devolverán error 503
 Se utiliza label de kubernetess, fichero virtual-service-recommendation-503.yml
@@ -476,7 +477,7 @@ Creamos la imagen:
 istioctl create –f istiofiles/virtual-service-recommendation-503.yml
 ```
 
-## RETRASOS
+### RETRASOS
 Inyecta retrasos, añade delays a las llamadas de servicios para ver cómo se comportan los consumidores.
 Añade un sleep de 7 segundos al 50 por ciento de las llamadas.
 Fichero virtual-service-recommendation-delay.yml
@@ -500,22 +501,22 @@ spec:
 ---
 ```
 
-# TRAZABILIDAD
+## TRAZABILIDAD
 Observabilidad outofthebox de Istio, Jaeger ui permite revisar la trazabilidad, Comunicaciones entre servicios y trazabilidad 
 
-## MÉTRICAS
+### MÉTRICAS
 Métricas outofthebox de Istio, Prometheus es un sistema para la visualización de métricas OpenSource que además de guardar datos tiene un sistema de alertas para notificar datos.
 Utiliza Graphana como Data Visualizer, además tiene la consola de prometheus.
 
-## KIALI
+### KIALI
 Que están haciendo los servicios en el service mesh, sirve para visualizar gráficamente las comunicaciones entre servicios y como están configurados.
 Instalación:
 ```
 kubectl apply kiali.yml
 ```
 
-# SEGURIDAD
-## WHITE LISTS
+## SEGURIDAD
+### WHITE LISTS
 Reglas para la comunicación entre los servicios, evita comunicaciones no esperadas. Con esto evitamos comprometer los servicios.
 Preferenceservice solo aceptará comunicaciones de recommendation service
 Fichero acl-whitelist.yml
@@ -546,8 +547,8 @@ spec:
     instances:
     - preferencesource.listentry
 ```
-	
-## BLACK LISTS
+
+### BLACK LISTS
 Se indicarán cuáles son las comunicaciones que no están permitidas.
 Para hacer la prueba vamos a denegar la comunicación entre customers y preferences.
 Denegaremos la comunicación e indicamos como informar al usuario.
@@ -579,7 +580,7 @@ spec:
     instances: [ denycustomerrequests.checknothing ]
 ```
 
-## MUTUAL TLS
+### MUTUAL TLS
 Con Istio la comunicación entre los proxy de cada uno de los servicios será con HTTPS y nuestros servicios puedan seguir tratando HTTP. Con esto se evita crear e instalar certificados.
 
 Fichero authentication-enable-tls.yml
@@ -610,13 +611,13 @@ curl http://${GATEWAY_URL}
 istioctl apply –f istiofiles/authentication-enable-tls.yml
 istioctl apply –f istiofiles/destination-rule-tls.yml
 istioctl authn tls-check | grep tutorial
-``` 
+```
 Podríamos hacer sniffer del tráfico entre servicios para revisarlo.
 ``` 
 Kubectl exec –it $CUSTOMER_POD –c istio-proxy /bin/bash
 Ifonfig para ver la ip 172.17.0.11 y desde la máquina
 sudo tcpdump –vvvv –A –i eth0 ‘((dst port 8080) and (net 172.17.0.11))’
-``` 
+```
 Deshabilitamos:
 ```
 istioctl delete –f istiofiles/authentication-enable-tls.yml

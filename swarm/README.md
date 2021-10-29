@@ -1,6 +1,6 @@
 # Desarrollo rápido con docker-compose y docker Swarm
 
-## importar máquina en windows 10
+## Importar máquina en windows 10
 ```
 docker-machine create --driver hyperv --hyperv-virtual-switch "VM-External-Switch" --hyperv-boot2docker-url file://C:/tmp/boot2docker.iso swarm1
 docker-machine env swarm1
@@ -10,17 +10,17 @@ docker-machine env swarm2
 docker-machine ssh swarm2
 ```
 
-## crear el manager
+## Crear el manager
 ```
 root@swarm1:/home/docker# docker swarm init
 ```
 
-## crear worker
+## Crear worker
 ```
 root@swarm2:/home/docker# docker swarm join --token SWMTKN-1-3hdxke0ifihew0ndkicb36vpsv3vtir93amvxvtygmmn3hd1e9-6yl1ypyj0lrgei0vdk0vi0ww9 10.228.51.190:2377
 ```
 
-### ver nodos
+### Ver nodos
 ```
 root@swarm1:/home/docker# docker node ls
 ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
@@ -32,7 +32,7 @@ Error response from daemon: This node is not a swarm manager. Worker nodes can't
 node or promote the current node to a manager.
 ```
 
-## instalar docker-compose en la máquina
+## Instalar docker-compose en la máquina
 ver: https://github.com/docker/compose/releases
 ```
 root@swarm1:/home/docker# cd /tmp
@@ -42,7 +42,7 @@ root@swarm1:/tmp# mkdir node-redis-example
 root@swarm1:/tmp# cd node-redis-example
 ```
 
-## crear fichero docker-compose.yml
+## Crear fichero docker-compose.yml
 ```
 version: "3"
 services:
@@ -96,15 +96,15 @@ volumes:
 networks:
  appnet1:
 ```
- 
-## probar compose
+
+## Probar compose
 ```
 root@swarm1:/tmp/node-redis-example#docker-compose up -d 
 root@swarm1:/tmp/node-redis-example#docker ps
 root@swarm1:/tmp/node-redis-example#docker-compose down
 ```
 
-## levantar compose en cloud
+## Levantar compose en cloud
 ```
 root@swarm1:/tmp/node-redis-example# docker stack deploy -c docker-compose.yml redis-node
 root@swarm1:/tmp/node-redis-example#docker ps
@@ -120,19 +120,19 @@ Removing service redis-node_redis
 Removing service redis-node_web
 Removing network redis-node_appnet1
 ```
-# Instalar herramienta portainer
+## Instalar herramienta portainer
 ```
 cd /tmp
 curl -L https://downloads.portainer.io/portainer-agent-stack.yml -o portainer-agent-stack.yml
 docker stack deploy --compose-file=portainer-agent-stack.yml portainer
 ```
 
-# Instalar herramenta swarmpit
+## Instalar herramenta swarmpit
 ```
 git clone https://github.com/swarmpit/swarmpit
 docker stack deploy -c swarmpit/docker-compose.yml swarmpit
 ```
-# Incluir stacks desde la aplicación p.e. portainer
+## Incluir stacks desde la aplicación p.e. portainer
 ```
 version: '3.1'
 services:
