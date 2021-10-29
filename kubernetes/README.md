@@ -1,40 +1,52 @@
-# MINIKUBE
+# KUBERNETES
 
-## Habilitar Hyper-V en windows 10
+## Instalación de minikube
+
+### Habilitar Hyper-V en windows 10
+
 ```
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
 ```
-## Arrancar minikube
+
+### Arrancar minikube
 
 Debe estar creado con el Administrador de Hyper-V el conmutador virtual VM-External-Switch como external a la red del equipo (eth0 o wlan)
+
 ```
 minikube start --vm-driver "hyperv" --hyperv-virtual-switch "VM-External-Switch" --memory 4096m
 ```
+
 ### Si hubiese algún problema:
+
 * Minikube delete
+
 ```
 minikube delete
 ```
+
 * Borrar carpetas de configuración
+
 ```
 C:\Users\usuario\.kube
 C:\Users\usuario\.minikube
 ```
+
 Volver a arrancar minikube
 
-## Asignar el environment de docker a minikube
+### Asignar el environment de docker a minikube
+
 ```
 > minikube docker-env | Invoke-Expression
 ```
-## Parar minikube
+
+### Parar minikube
+
 ```
 > minikube ssh
 $sudo poweroff
 ```
 
-# KUBERNETES
-
-# PODS
+## PODS
 
 ### Crear un pod
 ```
@@ -147,7 +159,7 @@ kubectl get pods -l app=frontend
 kubectl get pods -l env=dev
 ```
 
-# REPLICASETS
+## REPLICASETS
 
 Está a un nivel más alto del Pod, se le puede indicar cuantas replicas del Pod se necesitan. 
 Los Pods tienen que estar etiquetados, para que el replicaset sepa los pods que tiene que mantener replicados.
@@ -161,7 +173,7 @@ Incluir label al pod que esta corriendo (kubectl label pods)
 kubectl label pods podtest1 app=pop-label
 ```
 
-# DEPLOYMENTS
+## DEPLOYMENTS
 
 La gestión de los replicaset para actualizaciones de versión directa, los deployments son un objeto de alto nivel 
 que se hace cargo de los replicaset. 
@@ -178,7 +190,7 @@ deployment-test-84467d95b6   0         0         0       5m28s
 deployment-test-86677fd487   3         3         3       22m
 ```
 
-## Utilizar CHANGE-CAUSE
+### Utilizar CHANGE-CAUSE
 
 ```
 > kubectl apply -f .\dev.yaml --record
@@ -218,7 +230,7 @@ Pod Template:
   Volumes:      <none>
   
 ```
-## Utilizar ROLLBACK para marcha atrás de despliegue
+### Utilizar ROLLBACK para marcha atrás de despliegue
 ```
 > kubectl rollout history deployment deployment-test
 deployment.apps/deployment-test
@@ -250,7 +262,7 @@ REVISION  CHANGE-CAUSE
 6         Cambio de puerto 90
 ```
 
-# SERVICES
+## SERVICES
 Es un objeto aislado que observa los pods con un label configurado, el servicio mantendrá una IP única para realizar entre otras cosas consulta de estado a los pods. Además el servicio hace balanceo de carga realizando peticiones en principio con aplicando round-robin. Esto lo hará independientemente de que el pod esté incluido en un replicaset.
 
 Lo realiza independientemente de que los pods caigan y se levanten con la probabilidad de que cambie la IP de este. Los servicios realizan esto utilizando ENDPOINTS ya que mapea las IPS con los labels.
@@ -317,7 +329,7 @@ deployment-test-86677fd487-bwxgx   1/1     Running   0          11m   172.18.0.7
 > kubectl run --rm -ti --generator=run-pod/v1 podtest3 --image=nginx:alpine -- sh
 ```
 
-# NAMESPACES
+### NAMESPACES
 
 ```
 > kubectl get namespaces
@@ -367,7 +379,7 @@ No resource quota.
 No LimitRange resource.
 ```
 
-## DNS
+### DNS
 Full qualified domain name 
 ```
 nombreServicio + nombreNameSpace + svc.cluster.local (dns del cluster)
@@ -431,7 +443,7 @@ memory-demo   0/1     CrashLoopBackOff   3          69s
 \kubernetes\limits\request> kubectl describe node minikube
 ```
 
-## QoS
+### QoS
 Si coincide en limits y requests está garantizado, Guaranteed
 Si puede subir porque limits es mayor a request, Burstable
 Cuando no tiene límites, los más peligrosos ya que puede colapsar un nodo, BestEffort
@@ -476,7 +488,7 @@ Resource Quotas
 No LimitRange resource.
 ```
 
-# PROBES
+## PROBES
 Pruebas de diagnóstico sobre los pods
 
 Kubelet es quien sondea con probes a los pods, esto lo hace:
@@ -612,7 +624,7 @@ Tipos, cualquiera de ellos se ejecuta a través de Comando, TCP o HTTP:
 
 
 
-# CONFIGMAP
+## CONFIGMAP
 Maneja el versionado de dockerfiles, separa las configuraciones para hacer más portable los Pods, la configuración no se hace hardcoded en el Pod si no que se hace en el ConfigMap.
 Los configmaps están compuestos por clave, valor. P.e. Nginx:port, 80
 Ng.conf , para que el manifest de un Pod vea el configmap se pueden utilizar variables de entorno.
@@ -672,7 +684,7 @@ NAME                               READY   STATUS    RESTARTS   AGE
 deployment-test-69f4684694-ht9k4   1/1     Running   0          42m
 ```
 
-# SECRETS
+## SECRETS
 Es un objeto parecido al configmap, el secret guarda datos sensibles. Los configmaps guardan datos no sensibles.
 ```
 \kubernetes\secrets\secrets-files> kubectl create secret generic mysecret --from-file=.\test.txt
@@ -694,18 +706,18 @@ a través del comando envsubst se sustutiye los valores $USER y $PASS por los va
 \kubernetes\secrets\secrets-files> envsubst < secure.yaml > tmp.yaml
 ```
 
-# VOLUMES
+## VOLUMES
 Se utiliza para guardar el estado en las imágenes de docker, igualmente lo hace kubernetes. Con esto se hacen las aplicaciones STATEFULL
 
-## EmptyDir
+### EmptyDir
 Cuando kubernetes crea un contenedor nuevo en un Pod porque el anterior ha caído, el directorio se replica como directorio vacio. El nuevo contenedor monta el mismo directorio.
 La carpeta /foo existe dentro del Pod, si el Pod muere si se pierde por lo que está asociado al lifecycle del Pod.
 
-## HostPath
+### HostPath
 Para no peder la carpeta montada cuando se recrea el Pod se mantiene a nivel del Nodo. No suele ser una opción para producción porque los distintos nodos no van a compartir el volumen.
 
 
-# CLOUDVOLS
+## CLOUDVOLS
 El tipo de disco en AWS es EBS (Elastic Block Store) en Google Cloud PS (Persisted disk)
 Estos volúmenes se asocian a las instancias. Se gestionan de manera independiente.
 Los VolMounts se asocian a estos volúmenes, hay que especificar el Id del volumen, tipo del sistema de archivos etc. Por esto existe PVC y PV
@@ -713,7 +725,7 @@ Los VolMounts se asocian a estos volúmenes, hay que especificar el Id del volum
 PV (PersistentVolume) Guarda: Nombre, Tamaño, Aprovisionador (AWS, Google Cloud) y pide estas características al aprovisionador.
 PVC (PersistentVolumeClaim), reclamación de volumen persistente, lo que reclama es un PV al recurso Cloud. Reclamación directa al espacio del PV que solicita a su vez el espacio en el Cloud. Utiliza selector a través de labels para identificar los PV.
 
-## Persistent Volume (PV)
+### Persistent Volume (PV)
 ```
 \kubernetes\volumes> kubectl apply -f .\pv-pvc.yaml
 persistentvolume/task-pv-volume created

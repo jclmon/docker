@@ -1,6 +1,9 @@
-# Desarrollo rápido con docker-compose y docker Swarm
+# Docker-compose y Docker Swarm
+
+Desarrollo rápido con docker-compose y docker swarm
 
 ## Importar máquina en windows 10
+
 ```
 docker-machine create --driver hyperv --hyperv-virtual-switch "VM-External-Switch" --hyperv-boot2docker-url file://C:/tmp/boot2docker.iso swarm1
 docker-machine env swarm1

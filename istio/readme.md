@@ -1,4 +1,4 @@
-# ISTIO el service mesh del futuro
+# ISTIO
 
 [Istio](https://istio.io/) es una plataforma de [red de servicios](https://www.redhat.com/es/topics/microservices/what-is-a-service-mesh) con tecnología de open source, que permite controlar el intercambio de datos entre los [microservicios](https://www.redhat.com/es/topics/microservices/what-are-microservices). Incluye [API](https://www.redhat.com/es/topics/api/what-are-application-programming-interfaces) que le permiten [integrarse](https://www.redhat.com/es/topics/integration/what-is-integration) a cualquier plataforma de registro, telemetría o sistema de políticas.  El diseño de esta plataforma facilita su ejecución en distintos  entornos: on-premise, alojados en la nube, en [contenedores](https://www.redhat.com/es/topics/containers) de [Kubernetes](https://www.redhat.com/es/topics/containers/what-is-kubernetes) y en servicios que se ejecutan en [máquinas virtuales](https://www.redhat.com/es/topics/virtualization/what-is-a-virtual-machine), entre otros.
 
@@ -446,7 +446,7 @@ spec:
       perTryTimeout: 2s
 ```
 
-# TESTING
+## TESTING
 Pruebas sobre el mesh.
 
 ### TESTING CAOTICO
